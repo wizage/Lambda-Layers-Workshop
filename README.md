@@ -52,7 +52,7 @@ $ npm install moment
 
 You should now see a new `node_modules/` folder in your `hello_world` application folder.
 
-1. Now that our enviroment is set up we are going to dive into the `app.js` code. We are going to add the `moment` package we just installed to our existing application by changing the message from `Hello World` to `Today is <insert day>`. If you want to use axios functionality to return the ip address uncomment the lines or use the code below.
+2. Now that our enviroment is set up we are going to dive into the `app.js` code. We are going to add the `moment` package we just installed to our existing application by changing the message from `Hello World` to `Today is <insert day>`. If you want to use axios functionality to return the ip address uncomment the lines or use the code below.
 
 <details>
   <summary>Code example:</summary>
@@ -86,7 +86,7 @@ You should now see a new `node_modules/` folder in your `hello_world` applicatio
   ```
 </details>
 
-1. Now it is time to test our function out. To do this we will first create a test event file. For this example we will create a file called `event.json` in our `sam-app` folder. (This is different then our other `event.json` for simplicity)
+3. Now it is time to test our function out. To do this we will first create a test event file. For this example we will create a file called `event.json` in our `sam-app` folder. (This is different then our other `event.json` for simplicity)
 
 ```bash
 $ cd ../
@@ -105,7 +105,7 @@ $ sam local invoke "HelloWorldFunction" -e event.json
 {"statusCode":200,"body":"{\"message\":\"Today is Thursday\",\"location\":\"54.208.174.178\"}"}
 ```
 
-1. Now that we have a functional function we will now add in a Lambda layer to manage our dependancies that we added to our function.
+4. Now that we have a functional function we will now add in a Lambda layer to manage our dependancies that we added to our function.
 
 First lets create a Lambda layer directory in `sam-app`.
 
@@ -141,95 +141,94 @@ $ open package.json
 ```
 
 <detail>
-<summary>Your `package.json should look something like this:</summary>
+  <summary>Your `package.json should look something like this:</summary>
 
-```json
-{
-  "name": "hello_world",
-  "version": "1.0.0",
-  "description": "hello world sample for NodeJS",
-  "main": "app.js",
-  "repository": "https://github.com/awslabs/aws-sam-cli/tree/develop/samcli/local/init/templates/cookiecutter-aws-sam-hello-nodejs",
-  "author": "SAM CLI",
-  "license": "MIT",
-  "scripts": {
-    "test": "mocha tests/unit/"
-  },
-  "devDependencies": {
-    "chai": "^4.2.0",
-    "mocha": "^6.1.4"
+  ```json
+  {
+    "name": "hello_world",
+    "version": "1.0.0",
+    "description": "hello world sample for NodeJS",
+    "main": "app.js",
+    "repository": "https://github.com/awslabs/aws-sam-cli/tree/develop/samcli/local/init/templates/cookiecutter-aws-sam-hello-nodejs",
+    "author": "SAM CLI",
+    "license": "MIT",
+    "scripts": {
+      "test": "mocha tests/unit/"
+    },
+    "devDependencies": {
+      "chai": "^4.2.0",
+      "mocha": "^6.1.4"
+    }
   }
-}
-```
+  ```
 </detail>
 
 
 After the directory is setup we need to update the `template.yaml` with the correct information for the Lambda to find the layer. We will be making two changes. The first change we will be adding is a new resource, the resource we are making is the Lambda Layer. The second change is adding a `Layers` property in our Lambda function that references the new Layer resource we create. An example of the new template can be found below:
 
 <detail>
-<summary>Example template:</summary>
+  <summary>Example template:</summary>
 
-```yaml
-AWSTemplateFormatVersion: '2010-09-09'
-Transform: AWS::Serverless-2016-10-31
-Description: >
-    sam-app
+  ```yaml
+  AWSTemplateFormatVersion: '2010-09-09'
+  Transform: AWS::Serverless-2016-10-31
+  Description: >
+      sam-app
 
-    Sample SAM Template for sam-app
-    
-# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
-Globals:
-    Function:
-        Timeout: 3
+      Sample SAM Template for sam-app
+      
+  # More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+  Globals:
+      Function:
+          Timeout: 3
 
 
-Resources:
+  Resources:
 
-    HelloWorldFunction:
-        Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
-        Properties:
-            CodeUri: hello_world/
-            Handler: app.lambdaHandler
-            Layers:
-              - !Ref HelloWorldDepLayer
-            Runtime: nodejs8.10
-            Environment: # More info about Env Vars: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#environment-object
-                Variables:
-                    PARAM1: VALUE
-            Events:
-                HelloWorld:
-                    Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
-                    Properties:
-                        Path: /hello
-                        Method: get
-    HelloWorldDepLayer:
-        Type: AWS::Serverless::LayerVersion
-        Properties:
-            LayerName: sam-app-dependencies
-            Description: Dependencies for sam app
-            ContentUri: dependencies/
-            CompatibleRuntimes:
-              - nodejs6.10
-              - nodejs8.10
-            LicenseInfo: 'MIT'
-            RetentionPolicy: Retain
+      HelloWorldFunction:
+          Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+          Properties:
+              CodeUri: hello_world/
+              Handler: app.lambdaHandler
+              Layers:
+                - !Ref HelloWorldDepLayer
+              Runtime: nodejs8.10
+              Environment: # More info about Env Vars: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#environment-object
+                  Variables:
+                      PARAM1: VALUE
+              Events:
+                  HelloWorld:
+                      Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+                      Properties:
+                          Path: /hello
+                          Method: get
+      HelloWorldDepLayer:
+          Type: AWS::Serverless::LayerVersion
+          Properties:
+              LayerName: sam-app-dependencies
+              Description: Dependencies for sam app
+              ContentUri: dependencies/
+              CompatibleRuntimes:
+                - nodejs6.10
+                - nodejs8.10
+              LicenseInfo: 'MIT'
+              RetentionPolicy: Retain
 
-Outputs:
+  Outputs:
 
-    HelloWorldApi:
-      Description: "API Gateway endpoint URL for Prod stage for Hello World function"
-      Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/hello/"
+      HelloWorldApi:
+        Description: "API Gateway endpoint URL for Prod stage for Hello World function"
+        Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/hello/"
 
-    HelloWorldFunction:
-      Description: "Hello World Lambda Function ARN"
-      Value: !GetAtt HelloWorldFunction.Arn
+      HelloWorldFunction:
+        Description: "Hello World Lambda Function ARN"
+        Value: !GetAtt HelloWorldFunction.Arn
 
-    HelloWorldFunctionIamRole:
-      Description: "Implicit IAM Role created for Hello World function"
-      Value: !GetAtt HelloWorldFunctionRole.Arn
+      HelloWorldFunctionIamRole:
+        Description: "Implicit IAM Role created for Hello World function"
+        Value: !GetAtt HelloWorldFunctionRole.Arn
 
-```
-
+  ```
 </detail>
 
 Now that we have setup our directory correctly and updated our template we can verify that we can still run our Lambda locally.
@@ -238,7 +237,7 @@ Now that we have setup our directory correctly and updated our template we can v
 $ sam local invoke "HelloWorldFunction" -e event.json
 ```
 
-1. Now that we can run our functions locally and we have added our layers so now we will go ahead and deploy our Lambda function and our API (created during `sam init`).
+5. Now that we can run our functions locally and we have added our layers so now we will go ahead and deploy our Lambda function and our API (created during `sam init`).
 
 First we will need to create a resource bucket where our generated CloudFormation can live. This can be done simply by using the command below:
 
@@ -257,3 +256,13 @@ Once that has succeeded we can now run `sam deploy` to push our function out!
 ```bash
 $ sam deploy --template-file ./out.yaml --stack-name <your stack name> --capabilities CAPABILITY_IAM
 ```
+
+## Finishing up
+
+If you don't want the function any more in your account you can use this command to clean up your enviroment:
+
+```bash
+aws cloudformation delete-stack --stack-name <your stack name>
+```
+
+If there is any issues please open up an issue on this repo :)
