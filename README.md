@@ -144,7 +144,7 @@ $ rm -r node_modules
 $ open package.json
 ```
 
-<detail>
+<details>
   <summary>Your `package.json` should look something like this:</summary>
 
   This is an example `package.json`
@@ -167,12 +167,12 @@ $ open package.json
     }
   }
   ```
-</detail>
+</details>
 
 
 After the directory is setup we need to update the `template.yaml` with the correct information for the Lambda to find the layer. We will be making two changes. The first change we will be adding is a new resource, the resource we are making is the Lambda Layer. The second change is adding a `Layers` property in our Lambda function that references the new Layer resource we create. An example of the new template can be found below:
 
-<detail>
+<details>
   <summary>Example template:</summary>
 
   This is an example template:
@@ -237,7 +237,7 @@ After the directory is setup we need to update the `template.yaml` with the corr
         Value: !GetAtt HelloWorldFunctionRole.Arn
 
   ```
-</detail>
+</details>
 
 Now that we have setup our directory correctly and updated our template we can verify that we can still run our Lambda locally.
 
