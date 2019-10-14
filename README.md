@@ -7,10 +7,6 @@
 - Install the AWS SAM CLI
   - [Guide](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html)
 
-### Running this in [Cloud9](https://us-east-1.console.aws.amazon.com/cloud9/home):
-
-- IAM role allowed to create a Cloud9 enviroment and the ability to create Lambda Functions
-
 ## Workshop
 
 ### Initializing a new Lambda function
@@ -40,7 +36,9 @@ sam-app/
 
 The `template.yaml` file contains a SAM template file describing the infrastructure for the application we just created. The `app.js` will contain all the Lambda code that we will be writing.
 
-1. Now we are going to add a dependency for our application to allow us to add dates to our Hello World application.
+### Adding your dependencies 
+
+Now we are going to add a dependency for our application to allow us to add dates to our Hello World application.
 
 To do this we will need to cd into our new application directory and install the dependency.
 
@@ -52,7 +50,9 @@ $ npm install moment
 
 You should now see a new `node_modules/` folder in your `hello_world` application folder.
 
-2. Now that our enviroment is set up we are going to dive into the `app.js` code. We are going to add the `moment` package we just installed to our existing application by changing the message from `Hello World` to `Today is <insert day>`. If you want to use axios functionality to return the ip address uncomment the lines or use the code below.
+### Diving into the code
+
+Now that our enviroment is set up we are going to dive into the `app.js` code. We are going to add the `moment` package we just installed to our existing application by changing the message from `Hello World` to `Today is <insert day>`. If you want to use axios functionality to return the ip address uncomment the lines or use the code below.
 
 <details>
   <summary>Code example:</summary>
@@ -86,7 +86,9 @@ You should now see a new `node_modules/` folder in your `hello_world` applicatio
   ```
 </details>
 
-3. Now it is time to test our function out. To do this we will first create a test event file. For this example we will create a file called `event.json` in our `sam-app` folder. (This is different then our other `event.json` for simplicity)
+### Locally testing the function
+
+Now it is time to test our function out. To do this we will first create a test event file. For this example we will create a file called `event.json` in our `sam-app` folder. (This is different then our other `event.json` for simplicity)
 
 ```bash
 $ cd ../
@@ -105,7 +107,9 @@ $ sam local invoke "HelloWorldFunction" -e event.json
 {"statusCode":200,"body":"{\"message\":\"Today is Thursday\",\"location\":\"54.208.174.178\"}"}
 ```
 
-4. Now that we have a functional function we will now add in a Lambda layer to manage our dependancies that we added to our function.
+### Adding layers to your function
+
+Now that we have a functional function we will now add in a Lambda layer to manage our dependancies that we added to our function.
 
 First lets create a Lambda layer directory in `sam-app`.
 
@@ -141,7 +145,9 @@ $ open package.json
 ```
 
 <detail>
-  <summary>Your `package.json should look something like this:</summary>
+  <summary>Your `package.json` should look something like this:</summary>
+
+  This is an example `package.json`
 
   ```json
   {
@@ -168,6 +174,8 @@ After the directory is setup we need to update the `template.yaml` with the corr
 
 <detail>
   <summary>Example template:</summary>
+
+  This is an example template:
 
   ```yaml
   AWSTemplateFormatVersion: '2010-09-09'
@@ -237,7 +245,9 @@ Now that we have setup our directory correctly and updated our template we can v
 $ sam local invoke "HelloWorldFunction" -e event.json
 ```
 
-5. Now that we can run our functions locally and we have added our layers so now we will go ahead and deploy our Lambda function and our API (created during `sam init`).
+### Deploying your Lambda function
+
+Now that we can run our functions locally and we have added our layers so now we will go ahead and deploy our Lambda function and our API (created during `sam init`).
 
 First we will need to create a resource bucket where our generated CloudFormation can live. This can be done simply by using the command below:
 
