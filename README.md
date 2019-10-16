@@ -106,7 +106,7 @@ $ sam local invoke "HelloWorldFunction" -e event.json
 {"statusCode":200,"body":"{\"message\":\"Today is Thursday\",\"location\":\"54.208.174.178\"}"}
 ```
 
-### Extra credit - Stepping through and debugging your lambda function:
+### Stepping through and debugging your lambda function
 
 **Note:** These steps required you to have VSCode installed on your machine. If you don't have it installed please get the most recent version from [here](https://code.visualstudio.com/).
 
@@ -124,7 +124,6 @@ Click on the gear icon in the top right and select nodejs. It should open up a `
             "request": "attach",
             "address": "localhost",
             "port": 5858,
-            // From the sam init example, it would be "${workspaceRoot}/hello-world"
             "localRoot": "${workspaceRoot}/hello-world",
             "remoteRoot": "/var/task",
             "protocol": "inspector",
