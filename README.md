@@ -43,9 +43,8 @@ Now we are going to add a dependency for our application to allow us to add date
 To do this we will need to cd into our new application directory and install the dependency.
 
 ```bash
-$ cd sam-app/hello_world/
-$ npm install axios
-$ npm install moment
+$ cd sam-app/hello-world/
+$ npm install axios moment
 ```
 
 You should now see a new `node_modules/` folder in your `hello_world` application folder.
@@ -107,6 +106,40 @@ $ sam local invoke "HelloWorldFunction" -e event.json
 {"statusCode":200,"body":"{\"message\":\"Today is Thursday\",\"location\":\"54.208.174.178\"}"}
 ```
 
+### Extra credit - Stepping through and debugging your lambda function:
+
+**Note:** These steps required you to have VSCode installed on your machine. If you don't have it installed please get the most recent version from [here](https://code.visualstudio.com/).
+
+Open up VSCode for your project that your are current running. And select the debug icon on the right hand side. (It is the bug icon)
+
+Click on the gear icon in the top right and select nodejs. It should open up a `launch.json` file. Replace the contents in that file from the defaults to this:
+
+```json
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Attach to SAM CLI",
+            "type": "node",
+            "request": "attach",
+            "address": "localhost",
+            "port": 5858,
+            // From the sam init example, it would be "${workspaceRoot}/hello-world"
+            "localRoot": "${workspaceRoot}/hello-world",
+            "remoteRoot": "/var/task",
+            "protocol": "inspector",
+            "stopOnEntry": false
+        }
+    ]
+}
+```
+
+Now in a terminal window run the Lambda function locally one more time but this time include an additional flag like so:
+
+```bash
+$ sam local invoke "HelloWorldFunction" -e event.json -d 5858
+```
+
 ### Adding layers to your function
 
 Now that we have a functional function we will now add in a Lambda layer to manage our dependancies that we added to our function.
@@ -139,7 +172,7 @@ $ npm install
 Now that we have moved our `node_modules` from our application to a layer we can now go ahead and delete our `node_modules` folder and we can remove the dependencies section from our `package.json`. 
 
 ```bash
-$ cd ../../hello_world/
+$ cd ../../hello-world/
 $ rm -r node_modules
 $ open package.json
 ```
@@ -181,60 +214,52 @@ After the directory is setup we need to update the `template.yaml` with the corr
   AWSTemplateFormatVersion: '2010-09-09'
   Transform: AWS::Serverless-2016-10-31
   Description: >
-      sam-app
+    sam-app
 
-      Sample SAM Template for sam-app
-      
-  # More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+    Sample SAM Template for sam-app
+    
   Globals:
-      Function:
-          Timeout: 3
-
+    Function:
+      Timeout: 3
 
   Resources:
-
-      HelloWorldFunction:
-          Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
-          Properties:
-              CodeUri: hello_world/
-              Handler: app.lambdaHandler
-              Layers:
-                - !Ref HelloWorldDepLayer
-              Runtime: nodejs8.10
-              Environment: # More info about Env Vars: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#environment-object
-                  Variables:
-                      PARAM1: VALUE
-              Events:
-                  HelloWorld:
-                      Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
-                      Properties:
-                          Path: /hello
-                          Method: get
-      HelloWorldDepLayer:
-          Type: AWS::Serverless::LayerVersion
-          Properties:
-              LayerName: sam-app-dependencies
-              Description: Dependencies for sam app
-              ContentUri: dependencies/
-              CompatibleRuntimes:
-                - nodejs6.10
-                - nodejs8.10
-              LicenseInfo: 'MIT'
-              RetentionPolicy: Retain
+    HelloWorldFunction:
+      Type: AWS::Serverless::Function
+      Properties:
+        CodeUri: hello-world/
+        Handler: app.lambdaHandler
+        Layers:
+          - !Ref HelloWorldDepLayer
+        Runtime: nodejs10.x
+        Events:
+          HelloWorld:
+            Type: Api
+            Properties:
+              Path: /hello
+              Method: get
+    HelloWorldDepLayer:
+      Type: AWS::Serverless::LayerVersion
+      Properties:
+          LayerName: sam-app-dependencies
+          Description: Dependencies for sam app
+          ContentUri: dependencies/
+          CompatibleRuntimes:
+            - nodejs6.10
+            - nodejs8.10
+            - nodejs10.x
+          LicenseInfo: 'MIT'
+          RetentionPolicy: Retain
 
   Outputs:
-
-      HelloWorldApi:
-        Description: "API Gateway endpoint URL for Prod stage for Hello World function"
-        Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/hello/"
-
-      HelloWorldFunction:
-        Description: "Hello World Lambda Function ARN"
-        Value: !GetAtt HelloWorldFunction.Arn
-
-      HelloWorldFunctionIamRole:
-        Description: "Implicit IAM Role created for Hello World function"
-        Value: !GetAtt HelloWorldFunctionRole.Arn
+    HelloWorldApi:
+      Description: "API Gateway endpoint URL for Prod stage for Hello World function"
+      Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/hello/"
+    HelloWorldFunction:
+      Description: "Hello World Lambda Function ARN"
+      Value: !GetAtt HelloWorldFunction.Arn
+    HelloWorldFunctionIamRole:
+      Description: "Implicit IAM Role created for Hello World function"
+      Value: !GetAtt HelloWorldFunctionRole.Arn
 
   ```
 </details>
@@ -267,6 +292,7 @@ Once that has succeeded we can now run `sam deploy` to push our function out!
 $ sam deploy --template-file ./out.yaml --stack-name <your stack name> --capabilities CAPABILITY_IAM
 ```
 
+
 ## Finishing up
 
 If you don't want the function any more in your account you can use this command to clean up your enviroment:
@@ -276,3 +302,4 @@ aws cloudformation delete-stack --stack-name <your stack name>
 ```
 
 If there is any issues please open up an issue on this repo :)
+
